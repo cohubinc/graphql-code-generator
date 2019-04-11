@@ -147,7 +147,7 @@ export class BaseTypesVisitor<TRawConfig extends RawTypesConfig = RawTypesConfig
       .withName(this.convertName(node))
       .withContent(interfaces)
       .withComment((node.description as any) as string)
-      .withBlock(node.fields.join('\n')).string;
+      .withBlock([`   __typename:   "${node.name}"`, ...node.fields].join('\n')).string;
 
     const argumentsBlock = this.buildArgumentsBlock(originalNode);
 
@@ -162,7 +162,7 @@ export class BaseTypesVisitor<TRawConfig extends RawTypesConfig = RawTypesConfig
       .asKind('type')
       .withName(this.convertName(node))
       .withComment((node.description as any) as string)
-      .withBlock(node.fields.join('\n')).string;
+      .withBlock([`   __typename:   "${node.name}"`, ...node.fields].join('\n')).string;
 
     return [interfaceDefinition, argumentsBlock].filter(f => f).join('\n\n');
   }

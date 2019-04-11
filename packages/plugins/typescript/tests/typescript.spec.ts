@@ -1089,10 +1089,12 @@ describe('TypeScript', () => {
 
       expect(result).toBeSimilarStringTo(`
         export type TMutation = {
+          __typename:  "Mutation"
           foo?: Maybe<Scalars['String']>,
         };
 
         export type TMutationFooArgs = {
+          __typename:   "Mutation"
           id?: Maybe<Scalars['ID']>,
           input?: Maybe<TInput>
         };
@@ -1207,8 +1209,39 @@ describe('TypeScript', () => {
     `);
 
     const content = await plugin(schema, [], {}, { outputFile: '' });
-
     expect(content).not.toContainEqual('[object Object]');
+
+    validateTs(content);
+  });
+
+  it('should contain __typename', async () => {
+    const schema = buildSchema(/* GraphQL */ `
+      type User {
+        id: Int!
+        name: String!
+        email: String!
+      }
+
+      type QueryRoot {
+        allUsers: [User]!
+        userById(id: Int!): User
+
+        # Generates a new answer for the guessing game
+        answer: [Int!]!
+      }
+
+      type SubscriptionRoot {
+        newUser: User
+      }
+
+      schema {
+        query: QueryRoot
+        subscription: SubscriptionRoot
+      }
+    `);
+
+    const content = await plugin(schema, [], {}, { outputFile: '' });
+    expect(content).toContain('__typename');
 
     validateTs(content);
   });
